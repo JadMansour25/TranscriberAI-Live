@@ -9,12 +9,11 @@
 <body>
   <div class="app">
     <h1>Transcriber.ai</h1>
-    <p class="sub">Live transcription — multilingual.</p>
+    <p class="sub">Live transcription — multilingual, Dutch, English, Arabic & more.</p>
 
     <div class="controls">
       <label>
         Language
-        <!-- leave empty; script.js fills it with many languages -->
         <select id="lang"></select>
       </label>
 
@@ -33,11 +32,13 @@
     <div id="finals" class="finals"></div>
 
     <footer>
-      <small>Tip: speak clearly; short phrases work best. Works on Chrome, Safari, iPhone. Pro mode uses your secure gateway.</small>
+      <small>
+        Tip: Use Chrome for best results. First connection in Pro mode may take a few seconds.
+      </small>
     </footer>
   </div>
 
-  <!-- add ?v=2 to bust cache after this change -->
-  <script src="script.js?v=2"></script>
+  <!-- cache-buster => always fetch latest script -->
+  <script src="script.js?v=4"></script>
 </body>
 </html>
