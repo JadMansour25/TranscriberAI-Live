@@ -9,15 +9,18 @@
 <body>
   <div class="app">
     <h1>Transcriber.ai</h1>
-    <p class="sub">Live transcription (Dutch & English) — in your browser.</p>
+    <p class="sub">Live transcription — multilingual.</p>
 
     <div class="controls">
       <label>
         Language
-        <select id="lang">
-          <option value="nl-NL">Dutch (nl-NL)</option>
-          <option value="en-US">English (en-US)</option>
-        </select>
+        <!-- leave empty; script.js fills it with many languages -->
+        <select id="lang"></select>
+      </label>
+
+      <label style="display:flex;gap:6px;align-items:center">
+        <input type="checkbox" id="pro" />
+        Use Pro (Deepgram)
       </label>
 
       <button id="start">Start</button>
@@ -30,12 +33,11 @@
     <div id="finals" class="finals"></div>
 
     <footer>
-      <small>
-        Tip: speak clearly; short phrases work best. Works best in Chrome.
-      </small>
+      <small>Tip: speak clearly; short phrases work best. Works on Chrome, Safari, iPhone. Pro mode uses your secure gateway.</small>
     </footer>
   </div>
 
-  <script src="script.js"></script>
+  <!-- add ?v=2 to bust cache after this change -->
+  <script src="script.js?v=2"></script>
 </body>
 </html>
