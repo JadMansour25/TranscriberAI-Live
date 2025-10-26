@@ -1,0 +1,14 @@
+:root { --bg:#0b1020; --card:#111834; --ink:#eaeef8; --muted:#9fb0ff; }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Arial}
+.app{max-width:900px;margin:40px auto;padding:24px;background:var(--card);border-radius:16px}
+h1{margin:0 0 6px} .sub{opacity:.8;margin:0 0 18px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+select,button{background:#0f1430;color:var(--ink);border:1px solid #223;padding:10px 12px;border-radius:10px}
+button{cursor:pointer} button[disabled]{opacity:.5;cursor:not-allowed}
+.badge{background:#1a244b;border:1px solid #2b3a7a;padding:6px 10px;border-radius:999px;font-size:12px}
+.partial{font-style:italic;opacity:.8;margin:6px 0 10px}
+.finals{display:flex;flex-direction:column;gap:6px}
+.segment{padding:10px 12px;background:#0f1430;border:1px solid #223;border-radius:10px}
+.time{font-size:12px;opacity:.7;margin-bottom:2px}
+footer{margin-top:14px;opacity:.7}
