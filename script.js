@@ -1,7 +1,7 @@
 // ===== Config =====
-const GATEWAY_WSS = 'wss://transcriber-gateway.onrender.com/v1/stream'; // ✅ Replace with your exact URL if needed
+const GATEWAY_WSS = 'wss://transcriber-gateway.onrender.com/v1/stream'; // make sure this matches your Render URL
 
-// A broad language list (add more anytime)
+// Languages
 const LANGS = [
   'nl-NL','nl-BE','en-US','en-GB','en-AU','en-CA','en-IN','en-IE','en-NZ','en-ZA',
   'ar-SA','ar-AE','ar-LB','ar-SY','ar-EG','ar-MA','ar-TN','ar-IQ','ar-JO','ar-BH','ar-QA',
@@ -47,44 +47,57 @@ function downloadTXT(){
 }
 dlBtn.onclick = downloadTXT;
 
-// ===== Mode A: Browser SR =====
+// ===== Browser SR mode =====
 let rec=null, running=false;
 function startBrowser(){
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if(!SR){ alert('Use Chrome, or enable Pro mode.'); return; }
+  if(!SR){ alert('Use Chrome or turn on Pro mode.'); return; }
   rec = new SR();
   rec.lang = langSel.value; rec.interimResults=true; rec.continuous=true;
   rec.onstart=()=>{ running=true; setStatus('listening…'); startBtn.disabled=true; stopBtn.disabled=false; };
-  rec.onerror=e=>setStatus('error:'+ (e.error||'unknown'));
+  rec.onerror=e=>setStatus('error: '+ (e.error||'unknown'));
   rec.onend =()=>{ running=false; setStatus('stopped'); startBtn.disabled=false; stopBtn.disabled=true; };
   rec.onresult=(ev)=>{ let interim=''; for(let i=ev.resultIndex;i<ev.results.length;i++){const r=ev.results[i]; if(r.isFinal) addFinal(r[0].transcript.trim()); else interim+=r[0].transcript;} partialEl.textContent=interim.trim(); };
   rec.start();
 }
 function stopBrowser(){ if(rec && running) rec.stop(); }
 
-// ===== Mode B: Deepgram =====
-let ctx, proc, stream, ws;
+// ===== Deepgram mode =====
+let ctx, proc, stream, ws, wakeTimer;
 function floatTo16(f32){
   const b=new ArrayBuffer(f32.length*2), v=new DataView(b); let o=0;
   for(let i=0;i<f32.length;i++,o+=2){ let s=Math.max(-1,Math.min(1,f32[i])); v.setInt16(o, s<0?s*0x8000:s*0x7fff, true); }
   return b;
 }
 async function startDeepgram(){
-  try{ stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true, channelCount:1 }});}
-  catch{ alert('Mic blocked'); return;}
-
-  ctx = new AudioContext({ sampleRate: 16000 });
+  // Check gateway health first to “wake” free instance
+  setStatus('waking server…');
+  try { await fetch(GATEWAY_WSS.replace('wss://','https://').replace('/v1/stream','/health')); } catch {}
+  // mic
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({ audio:{ echoCancellation:true, noiseSuppression:true, channelCount:1 }});
+  }catch(e){
+    alert('Microphone permission is needed. Please allow access.');
+    setStatus('mic blocked'); return;
+  }
+  // audio ctx
+  try { ctx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 }); }
+  catch { ctx = new (window.AudioContext || window.webkitAudioContext)(); }
   const src = ctx.createMediaStreamSource(stream);
   proc = ctx.createScriptProcessor(4096,1,1);
 
+  // websocket
+  setStatus('connecting… (free plan may take ~20–50s the first time)');
   ws = new WebSocket(`${GATEWAY_WSS}?lang=${encodeURIComponent(langSel.value)}`);
-  ws.onopen = () => { setStatus('connected'); startBtn.disabled=true; stopBtn.disabled=false; };
+  ws.onopen = () => { clearTimeout(wakeTimer); setStatus('connected'); startBtn.disabled=true; stopBtn.disabled=false; };
+  ws.onerror = (e) => { setStatus('ws error (check URL & key)'); };
+  ws.onclose = () => { setStatus('stopped'); };
+
   ws.onmessage = (e) => {
-    const msg = JSON.parse(e.data);
-    if (msg.type==='partial') partialEl.textContent = msg.text;
-    if (msg.type==='final'){ partialEl.textContent=''; addFinal(msg.text); }
+    let msg; try { msg = JSON.parse(e.data); } catch { return; }
+    if (msg.type==='partial') partialEl.textContent = msg.text || '';
+    if (msg.type==='final'){ partialEl.textContent=''; if (msg.text) addFinal(msg.text); }
   };
-  ws.onclose = () => setStatus('stopped');
 
   src.connect(proc);
   proc.onaudioprocess = (ev) => {
@@ -92,6 +105,9 @@ async function startDeepgram(){
     if (ws && ws.readyState === WebSocket.OPEN) ws.send(floatTo16(f32));
   };
   proc.connect(ctx.destination);
+
+  // show wake-up hint if it takes long
+  wakeTimer = setTimeout(()=> setStatus('still waking… this is normal on the free plan'), 8000);
 }
 function stopDeepgram(){
   try{ proc?.disconnect(); }catch{}
@@ -100,13 +116,13 @@ function stopDeepgram(){
   try{ ctx?.close(); }catch{}
 }
 
-// ===== Buttons =====
+// Buttons
 startBtn.onclick = () => {
   finalsEl.innerHTML=''; partialEl.textContent=''; transcript=[];
-  if(proChk.checked) startDeepgram(); else startBrowser();
+  if (proChk.checked) startDeepgram(); else startBrowser();
 };
 stopBtn.onclick = () => {
-  if(proChk.checked) stopDeepgram(); else stopBrowser();
+  if (proChk.checked) stopDeepgram(); else stopBrowser();
   startBtn.disabled=false; stopBtn.disabled=true;
 };
 setStatus('idle');
