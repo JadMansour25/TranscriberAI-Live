@@ -9,36 +9,53 @@
 <body>
   <div class="app">
     <h1>Transcriber.ai</h1>
-    <p class="sub">Live transcription — multilingual, Dutch, English, Arabic & more.</p>
+    <p class="sub">Real-time transcription in Dutch, English, Arabic & more.</p>
 
     <div class="controls">
-      <label>
-        Language
-        <select id="lang"></select>
-      </label>
+      <div class="row wrap">
+        <label class="field">
+          <span>Language</span>
+          <select id="lang"></select>
+        </label>
 
-      <label style="display:flex;gap:6px;align-items:center">
-        <input type="checkbox" id="pro" />
-        Use Pro (Deepgram)
-      </label>
+        <label class="field prochk">
+          <input type="checkbox" id="pro" />
+          <span>Use Pro (Deepgram)</span>
+        </label>
 
-      <button id="start">Start</button>
-      <button id="stop" disabled>Stop</button>
-      <button id="download" disabled>Download TXT</button>
-      <span id="status" class="badge">idle</span>
+        <button id="start">Start</button>
+        <button id="stop" disabled>Stop</button>
+        <button id="download" disabled>Download TXT</button>
+        <button id="save" disabled>Save</button>
+        <button id="historyBtn">History</button>
+        <span id="status" class="badge">idle</span>
+      </div>
+
+      <div class="row meterRow">
+        <div class="meterWrap" title="Mic level">
+          <div id="meter" class="meter"></div>
+        </div>
+        <button id="autodetect" class="ghost" title="Auto-detect EN/NL/AR">Auto-detect (EN/NL/AR)</button>
+      </div>
     </div>
 
     <div id="partial" class="partial"></div>
     <div id="finals" class="finals"></div>
 
+    <details id="history" class="history">
+      <summary>Saved transcripts</summary>
+      <div id="historyList" class="historyList"></div>
+    </details>
+
     <footer>
       <small>
-        Tip: Use Chrome for best results. First connection in Pro mode may take a few seconds.
+        Tip: On free hosting, Pro mode may show “Waking…” for a few seconds.
+        Works on Chrome, Safari, and iPhone. Your data stays in your browser.
       </small>
     </footer>
   </div>
 
-  <!-- cache-buster => always fetch latest script -->
-  <script src="script.js?v=4"></script>
+  <!-- cache-buster -->
+  <script src="script.js?v=7"></script>
 </body>
 </html>
