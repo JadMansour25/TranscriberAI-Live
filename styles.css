@@ -1,14 +1,46 @@
-:root { --bg:#0b1020; --card:#111834; --ink:#eaeef8; --muted:#9fb0ff; }
+:root{
+  --bg:#0b1020; --card:#111834; --ink:#eaeef8; --muted:#9fb0ff;
+  --btn:#0f1430; --bd:#223; --pill:#1a244b; --pillbd:#2b3a7a; --accent:#2b58ff;
+}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,Arial}
-.app{max-width:900px;margin:40px auto;padding:24px;background:var(--card);border-radius:16px}
-h1{margin:0 0 6px} .sub{opacity:.8;margin:0 0 18px}
-.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
-select,button{background:#0f1430;color:var(--ink);border:1px solid #223;padding:10px 12px;border-radius:10px}
-button{cursor:pointer} button[disabled]{opacity:.5;cursor:not-allowed}
-.badge{background:#1a244b;border:1px solid #2b3a7a;padding:6px 10px;border-radius:999px;font-size:12px}
-.partial{font-style:italic;opacity:.8;margin:6px 0 10px}
+.app{max-width:960px;margin:32px auto;padding:20px;background:var(--card);border-radius:16px}
+h1{margin:0 0 6px} .sub{opacity:.85;margin:0 0 14px}
+.controls{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+.row{display:flex;gap:10px;align-items:center}
+.wrap{flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:6px}
+select,button{background:var(--btn);color:var(--ink);border:1px solid var(--bd);padding:10px 12px;border-radius:10px;font-size:14px}
+button{cursor:pointer}
+button[disabled]{opacity:.5;cursor:not-allowed}
+button.ghost{background:transparent;border-color:#2a386a}
+.badge{background:var(--pill);border:1px solid var(--pillbd);padding:6px 10px;border-radius:999px;font-size:12px}
+.partial{font-style:italic;opacity:.85;margin:8px 0 10px}
 .finals{display:flex;flex-direction:column;gap:6px}
-.segment{padding:10px 12px;background:#0f1430;border:1px solid #223;border-radius:10px}
+.segment{padding:10px 12px;background:#0f1430;border:1px solid var(--bd);border-radius:10px}
 .time{font-size:12px;opacity:.7;margin-bottom:2px}
-footer{margin-top:14px;opacity:.7}
+footer{margin-top:14px;opacity:.75}
+
+/* Spinner on the status pill */
+.badge.spin::after{
+  content:""; display:inline-block; width:12px; height:12px; margin-left:8px;
+  border:2px solid #5d6bff; border-top-color:transparent; border-radius:50%;
+  animation:sp 0.8s linear infinite; vertical-align:-2px;
+}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Mic level meter */
+.meterWrap{width:160px;height:12px;background:#0e1330;border:1px solid var(--bd);border-radius:999px;overflow:hidden}
+.meter{height:100%;width:0%}
+
+.history{margin-top:12px}
+.historyList{display:flex;flex-direction:column;gap:8px}
+.historyItem{display:flex;gap:8px;align-items:center}
+.historyItem .meta{opacity:.8;font-size:12px}
+.historyItem button{padding:6px 8px}
+
+@media (max-width:720px){
+  .app{margin:0;min-height:100vh;border-radius:0}
+  select,button{padding:12px 14px}
+  .meterWrap{flex:1;max-width:100%}
+}
